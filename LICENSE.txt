@@ -1,0 +1,9 @@
+Physics Simulation Hub
+Copyright (c) 2026
+
+This software is provided for educational use.
+All physics simulations are interactive learning tools
+designed for students and educators.
+
+Permission is granted to install and use this application
+for educational purposes in schools and coaching centers.

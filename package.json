@@ -1,0 +1,79 @@
+{
+  "name": "physics-simulation-hub",
+  "productName": "Physics Simulation Hub",
+  "private": true,
+  "version": "1.0.0",
+  "description": "133 Interactive Physics Simulations for schools and coaching centers",
+  "author": { "name": "Physics Simulation Hub", "email": "your-email@gmail.com" },
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev":            "vite",
+    "build":          "vite build",
+    "electron:dev":   "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:win":   "vite build && electron-builder --win --publish never",
+    "electron:mac":   "vite build && electron-builder --mac --publish never",
+    "release:win":    "vite build && electron-builder --win --publish always",
+    "release:mac":    "vite build && electron-builder --mac --publish always",
+    "release:all":    "vite build && electron-builder --win --mac --publish always",
+    "version:patch":  "npm version patch && git push && git push --tags",
+    "version:minor":  "npm version minor && git push && git push --tags",
+    "version:major":  "npm version major && git push && git push --tags"
+  },
+  "build": {
+    "appId": "com.physicsimhub.app",
+    "productName": "Physics Simulation Hub",
+    "directories": { "output": "release" },
+    "files": [ "dist/**/*", "electron/**/*" ],
+    "extraResources": [
+      { "from": "public/simulations", "to": "simulations", "filter": ["**/*"] },
+      { "from": "public/pdfs",        "to": "pdfs",        "filter": ["**/*"] }
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "utkarshtocsi-code",
+      "repo":  "physics-simulation-hub",
+      "releaseType": "release"
+    },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "electron/icons/icon.ico",
+      "artifactName": "Physics.Simulation.Hub.Setup.${version}.exe"
+    },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["x64","arm64"] }],
+      "icon": "electron/icons/icon.icns",
+      "category": "public.app-category.education",
+      "artifactName": "Physics.Simulation.Hub.${version}.dmg"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "icon": "electron/icons/icon.png",
+      "category": "Education"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Physics Simulation Hub",
+      "license": "LICENSE.txt"
+    },
+    "dmg": { "title": "Physics Simulation Hub ${version}" }
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.0",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.0",
+    "electron-updater": "^6.3.0",
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.2.0"
+  }
+}
