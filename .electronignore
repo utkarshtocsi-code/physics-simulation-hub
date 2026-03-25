@@ -1,0 +1,9 @@
+# Files to ignore during electron-builder packaging
+node_modules/.cache
+src
+index.html
+vite.config.js
+README.md
+*.log
+.git
+.gitignore

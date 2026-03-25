@@ -1,0 +1,103 @@
+# .github/workflows/release.yml
+# Jab bhi aap GitHub par new tag push karein (v1.0.0, v1.1.0...)
+# GitHub automatically Windows .exe aur Mac .dmg build karke
+# Release page par upload kar deta hai — BILKUL FREE!
+
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'           # v1.0.0, v1.1.0, v2.0.0 par trigger hoga
+
+jobs:
+
+  # ── Windows Build ──────────────────────────────────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build Windows app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run electron:win
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: release/*.exe
+
+  # ── Mac Build ──────────────────────────────────────────────────────────────
+  build-mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build Mac app
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run electron:mac
+
+      - name: Upload Mac artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-build
+          path: release/*.dmg
+
+  # ── Create GitHub Release ──────────────────────────────────────────────────
+  create-release:
+    needs: [build-windows, build-mac]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: ./release
+
+      - name: Download Mac build
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-build
+          path: ./release
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
+          body: |
+            ## Physics Simulation Hub ${{ github.ref_name }}
+
+            ### Download karein:
+            - **Windows:** `Physics.Simulation.Hub.Setup.exe` download karein
+            - **Mac:** `Physics.Simulation.Hub.dmg` download karein
+
+            ### Already installed hai?
+            App automatically update notification dega!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
